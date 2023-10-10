@@ -39,49 +39,50 @@ namespace ExcelToSql
 
         private void button2_Click(object sender, EventArgs e)
         {
-            FileInfo existingFile = new FileInfo(textBox1.Text);
+            try{
+                FileInfo existingFile = new FileInfo(textBox1.Text);
 
-            string directoryPath = System.IO.Path.GetDirectoryName(textBox1.Text);
-            MessageBox.Show("Diretctory is :" +directoryPath.ToString());
-            
+                string directoryPath = System.IO.Path.GetDirectoryName(textBox1.Text);
+                MessageBox.Show("Diretctory is :" + directoryPath.ToString());
 
-            using (ExcelPackage package = new ExcelPackage(existingFile))
-            {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets["Sheet1"];
-                //int colCount = worksheet.Dimension.End.Column;
-                int rowCount = worksheet.Dimension.End.Row;
-                int colCount = worksheet.Dimension.End.Column;
 
-                for (int row = 1; row <= rowCount; row++)
+                using (ExcelPackage package = new ExcelPackage(existingFile))
                 {
-                    //create a bool
-                    bool RowIsEmpty = true;
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets["Sheet1"];
+                    //int colCount = worksheet.Dimension.End.Column;
+                    int rowCount = worksheet.Dimension.End.Row;
+                    int colCount = worksheet.Dimension.End.Column;
 
-                    for (int col = 1; col <= colCount; col++)
+                    for (int row = 1; row <= rowCount; row++)
                     {
-                        //check if the cell is empty or not
-                        if (worksheet.Cells[row, col].Value != null)
+                        //create a bool
+                        bool RowIsEmpty = true;
+
+                        for (int col = 1; col <= colCount; col++)
                         {
-                            RowIsEmpty = false;
+                            //check if the cell is empty or not
+                            if (worksheet.Cells[row, col].Value != null)
+                            {
+                                RowIsEmpty = false;
+                            }
+                        }
+
+                        //display result
+                        if (RowIsEmpty)
+                        {
+                            MessageBox.Show("Row " + row + " is empty.<br>");
                         }
                     }
 
-                    //display result
-                    if (RowIsEmpty)
-                    {
-                        MessageBox.Show("Row " + row + " is empty.<br>");
-                    }
-                }
 
-
-                //MessageBox.Show(rowCount.ToString());
-                //MessageBox.Show(comboBox1.Text);
-                //if(comboBox1.Text == "CVTS")
-                //{
+                    //MessageBox.Show(rowCount.ToString());
+                    //MessageBox.Show(comboBox1.Text);
+                    //if(comboBox1.Text == "CVTS")
+                    //{
                     StringBuilder sb = new StringBuilder();
-                    for (int row=1; row < rowCount+1; row++)
+                    for (int row = 1; row < rowCount + 1; row++)
                     {
-                        
+
                         sb.AppendLine("INSERT INTO [dbo].[Transactions]\r\n" +
                             "([batch_code]\r\n" +
                             ",[tracking_number]\r\n" +
@@ -120,11 +121,11 @@ namespace ExcelToSql
                             ",[courier_tracking_number]\r\n           " +
                             ",[seq])\r\n     " +
                             "VALUES\r\n           " +
-                            "('"+ worksheet.Cells[row, 1].Value + "'\r\n           " +
-                            ",'"+ worksheet.Cells[row, 1].Value + "'\r\n           " +
-                            ",'"+ worksheet.Cells[row, 2].Value + "'\r\n           " +
+                            "('" + worksheet.Cells[row, 1].Value + "'\r\n           " +
+                            ",'" + worksheet.Cells[row, 1].Value + "'\r\n           " +
+                            ",'" + worksheet.Cells[row, 2].Value + "'\r\n           " +
                             ",''\r\n           " +
-                            ",'"+ worksheet.Cells[row, 3].Value + "'\r\n           " +
+                            ",'" + worksheet.Cells[row, 3].Value + "'\r\n           " +
                             ",''\r\n           ,''\r\n           " +
                             ",''\r\n           ,''\r\n           " +
                             ",''\r\n           ,''\r\n           " +
@@ -135,12 +136,12 @@ namespace ExcelToSql
                             ",0\r\n           ,''\r\n           " +
                             ",''\r\n           ,''\r\n           " +
                             ",''\r\n           " +
-                            ",'"+ DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture) + "'\r\n           " +
+                            ",'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture) + "'\r\n           " +
                             ",'003'\r\n           " +
-                            ",'"+ DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture) + "'\r\n           " +
+                            ",'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture) + "'\r\n           " +
                             ",'060'\r\n           " +
-                            ",'"+ DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture) + "'\r\n           " +
-                            ",'"+ worksheet.Cells[row, 6].Value + "'\r\n           " +
+                            ",'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture) + "'\r\n           " +
+                            ",'" + worksheet.Cells[row, 6].Value + "'\r\n           " +
                             ",null\r\n           " +
                             ",'N'\r\n           " +
                             ",null\r\n           " +
@@ -148,12 +149,18 @@ namespace ExcelToSql
                             ",''\r\n           " +
                             ",1\r\n\t\t   )" +
                             "\r\nGO");
+                        //}
                     }
-                System.IO.FileInfo file = new System.IO.FileInfo(directoryPath + "\\script.txt");
-                file.Directory.Create();
-                System.IO.File.WriteAllText(file.FullName, sb.ToString());
+                    System.IO.FileInfo file = new System.IO.FileInfo(directoryPath + "\\script.txt");
+                    file.Directory.Create();
+                    System.IO.File.WriteAllText(file.FullName, sb.ToString());
                 }
-            //}
+                MessageBox.Show("Success! Pls open input folder and script.txt to view results");
+            }
+            catch(Exception ex) {
+                MessageBox.Show(ex.ToString());
+            }
+
         }
     }
 }
